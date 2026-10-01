@@ -47,7 +47,7 @@ with tempfile.TemporaryDirectory(prefix='gd-support-sign-') as folder:
                 subprocess.run([tools/'apksigner','sign','--ks',secret,'--ks-key-alias','gd-support','--ks-pass','file:'+str(password),'--out',target,source],check=True)
                 verified=subprocess.check_output([tools/'apksigner','verify','--verbose','--print-certs',target],text=True)
                 if re.findall(r'Signer #[0-9]+ certificate SHA-256 digest: ([a-f0-9]{64})',verified)!=[policy['certificate_sha256']]:
-                    target.unlink();raise ValueError('Signing certificate mismatch')
+                    target.unlink();raise ValueError('Signing certificate mismatch; public verifier report: '+verified)
                 artifacts[abi]={'filename':target.name,'sha256':hashlib.sha256(target.read_bytes()).hexdigest(),'size':target.stat().st_size,'version_code':int(match[2])}
             elif filename.endswith('-source.tar.gz'):
                 (output/filename).write_bytes(source.read_bytes())
