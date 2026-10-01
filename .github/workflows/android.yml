@@ -142,8 +142,19 @@ jobs:
           name: gd-support-${{ matrix.abi }}
           path: artifacts/*
           retention-days: 30
-  sign:
+  verified:
     needs: [checks, android]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Require checks and every Android architecture
+        env:
+          CHECKS_RESULT: ${{ needs.checks.result }}
+          ANDROID_RESULT: ${{ needs.android.result }}
+        run: test "$CHECKS_RESULT" = success && test "$ANDROID_RESULT" = success
+  sign:
+    needs: verified
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
