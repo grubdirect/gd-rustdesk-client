@@ -10,7 +10,21 @@ concurrency:
   group: android-${{ github.ref }}
   cancel-in-progress: false
 jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Test artifact rejection and real signatures with a throwaway key
+        run: python3 -m unittest gd/test_sign.py -v
   android:
+    needs: checks
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     strategy:
@@ -124,7 +138,7 @@ jobs:
           path: artifacts/*
           retention-days: 30
   sign:
-    needs: android
+    needs: [checks, android]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
