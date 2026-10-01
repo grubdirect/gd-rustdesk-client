@@ -34,6 +34,8 @@ def prepare(source):
         'enable-keyboard': 'N', 'enable-clipboard': 'N', 'enable-file-transfer': 'N',
         'enable-audio': 'N', 'enable-camera': 'N', 'enable-terminal': 'N',
         'enable-tunnel': 'N', 'enable-lan-discovery': 'N',
+        'enable-remote-printer': 'N', 'enable-remote-restart': 'N',
+        'enable-record-session': 'N', 'enable-block-input': 'N', 'enable-privacy-mode': 'N',
         'allow-remote-config-modification': 'N', 'approve-mode': 'click',
         'verification-method': 'use-temporary-password', 'allow-insecure-tls-fallback': 'N',
     }
