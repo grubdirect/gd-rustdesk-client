@@ -86,6 +86,13 @@ mod gd_policy_tests {
         '              onPressed: (context) => launchUrlString('+json.dumps(POLICY['source_url'])+'),\n'
         '              leading: const Icon(Icons.code),\n'
         '            ),')
+    # Retain upstream notices and mark the date and author of each modified file.
+    notice = 'Modified by Grub Direct on 2026-10-01 for GD Remote Support; see GD-BUILD.json.'
+    for modified in (config, gradle, common):
+        modified.write_text('// '+notice+'\n'+modified.read_text())
+    xml = manifest.read_text()
+    declaration, rest = xml.split('\n', 1)
+    manifest.write_text(declaration+'\n<!-- '+notice+' -->\n'+rest)
     (source/'GD-BUILD.json').write_text(json.dumps(POLICY,indent=2)+'\n')
     print('Applied pinned GD server, view-only policy and separate Android identity.')
 
