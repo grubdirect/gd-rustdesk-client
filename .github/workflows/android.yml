@@ -51,7 +51,11 @@ jobs:
           flutter-version: '3.24.5'
           cache: true
       - name: Apply upstream Flutter patch
-        run: git -C "$FLUTTER_ROOT" apply "$GITHUB_WORKSPACE/source/.github/patches/flutter_3.24.4_dropdown_menu_enableFilter.diff"
+        run: |
+          patch="$GITHUB_WORKSPACE/source/.github/patches/flutter_3.24.4_dropdown_menu_enableFilter.diff"
+          if ! git -C "$FLUTTER_ROOT" apply --reverse --check "$patch"; then
+            git -C "$FLUTTER_ROOT" apply "$patch"
+          fi
       - uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9
         with:
           toolchain: '1.75'
@@ -72,6 +76,9 @@ jobs:
           cd ..
           flutter_rust_bridge_codegen --rust-input ./src/flutter_ffi.rs --dart-output ./flutter/lib/generated_bridge.dart --c-output ./flutter/macos/Runner/bridge_generated.h
           cp flutter/macos/Runner/bridge_generated.h flutter/ios/Runner/bridge_generated.h
+      - name: Verify pinned settings cannot be overwritten
+        working-directory: source
+        run: cargo test --locked -p hbb_common gd_policy_tests --lib
       - uses: nttld/setup-ndk@ed92fe6cadad69be94a966a7ee3271275e62f779
         id: ndk
         with:
@@ -115,4 +122,33 @@ jobs:
         with:
           name: gd-support-${{ matrix.abi }}
           path: artifacts/*
+          retention-days: 30
+  sign:
+    needs: android
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          pattern: gd-support-*
+          path: incoming
+      - name: Verify provenance and sign with dedicated support certificate
+        env:
+          GD_BUILD_COMMIT: ${{ github.sha }}
+          GD_BUILD_RUN: ${{ github.run_id }}
+          GD_SUPPORT_KEYSTORE_B64: ${{ secrets.GD_SUPPORT_KEYSTORE_B64 }}
+          GD_SUPPORT_STORE_PASSWORD: ${{ secrets.GD_SUPPORT_STORE_PASSWORD }}
+        run: python3 gd/sign.py incoming signed
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: signed-gd-support
+          path: signed/*
           retention-days: 30

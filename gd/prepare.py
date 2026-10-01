@@ -50,6 +50,27 @@ def prepare(source):
             'pub const RENDEZVOUS_SERVERS: &[&str] = &['+json.dumps(server['host'])+'];')
     replace(config, 'pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";',
             'pub const RS_PUB_KEY: &str = '+json.dumps(server['key'])+';')
+    with config.open('a') as output:
+        output.write('''
+// Regression checks for the distributed GD configuration, not a network test.
+#[cfg(test)]
+mod gd_policy_tests {
+    use super::*;
+    #[test]
+    fn gd_policy_rejects_server_and_permission_overrides() {
+        let pinned = OVERWRITE_SETTINGS.read().unwrap().clone();
+        for (name, expected) in pinned {
+            Config::set_option(name.clone(), "untrusted-change".to_owned());
+            assert_eq!(Config::get_option(&name), expected, "{}", name);
+        }
+        LocalConfig::set_option("disable-floating-window".to_owned(), "N".to_owned());
+        assert_eq!(LocalConfig::get_option("disable-floating-window"), "Y");
+        assert_eq!(Config::get_option("custom-rendezvous-server"), RENDEZVOUS_SERVERS[0]);
+        assert_eq!(Config::get_option("key"), RS_PUB_KEY);
+        assert_eq!(RENDEZVOUS_SERVERS.len(), 1);
+    }
+}
+''')
     gradle = source/'flutter/android/app/build.gradle'
     replace(gradle, 'applicationId "com.carriez.flutter_hbb"', 'applicationId '+json.dumps(POLICY['package']))
     replace(gradle, 'signingConfig signingConfigs.release', '// Signed separately with the GD support release identity after verification.')

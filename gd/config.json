@@ -13,5 +13,6 @@
     "key": "OUFK49tB0AwtYWGP7IpM+jl5q2VkS1COxmfXlNIr2uM=",
     "api": ""
   },
-  "source_url": "https://github.com/grubdirect/gd-rustdesk-client"
+  "source_url": "https://github.com/grubdirect/gd-rustdesk-client",
+  "certificate_sha256": "4069fcf6418cbc1816a4be0f9af282cdc6fd96490922ab5324e33e935db5910f"
 }
