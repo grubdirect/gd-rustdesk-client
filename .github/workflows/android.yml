@@ -130,7 +130,7 @@ jobs:
         working-directory: source/flutter
         run: |
           sed -i 's/org.gradle.jvmargs=-Xmx1024M/org.gradle.jvmargs=-Xmx2g/g' android/gradle.properties
-          flutter build apk --release --target-platform '${{ matrix.platform }}' --split-per-abi --build-name=1.4.9-gd.1 --build-number=1001
+          flutter build apk --release --target-platform '${{ matrix.platform }}' --split-per-abi --build-name=1.4.9-gd.2 --build-number=1002
       - name: Package APK and corresponding source
         env:
           GD_BUILD_COMMIT: ${{ github.sha }}

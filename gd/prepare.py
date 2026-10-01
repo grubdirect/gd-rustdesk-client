@@ -86,9 +86,19 @@ mod gd_policy_tests {
         '              onPressed: (context) => launchUrlString('+json.dumps(POLICY['source_url'])+'),\n'
         '              leading: const Icon(Icons.code),\n'
         '            ),')
+    server_model = source/'flutter/lib/models/server_model.dart'
+    replace(server_model,
+        '      if (!await AndroidPermissionManager.check(kManageExternalStorage)) {\n'
+        '        await AndroidPermissionManager.request(kManageExternalStorage);\n'
+        '      }',
+        '      // GD: view-only sessions do not need access to files on the POS.\n'
+        '      if ((await bind.mainGetOption(key: kOptionEnableFileTransfer)) != "N" &&\n'
+        '          !await AndroidPermissionManager.check(kManageExternalStorage)) {\n'
+        '        await AndroidPermissionManager.request(kManageExternalStorage);\n'
+        '      }')
     # Retain upstream notices and mark the date and author of each modified file.
     notice = 'Modified by Grub Direct on 2026-10-01 for GD Remote Support; see GD-BUILD.json.'
-    for modified in (config, gradle, common):
+    for modified in (config, gradle, common, server_model):
         modified.write_text('// '+notice+'\n'+modified.read_text())
     xml = manifest.read_text()
     declaration, rest = xml.split('\n', 1)
