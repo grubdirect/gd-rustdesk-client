@@ -1,0 +1,17 @@
+{
+  "upstream_repository": "rustdesk/rustdesk",
+  "upstream_commit": "6c578292e8ebbbec708b76986ba8c4bc7c509747",
+  "common_commit": "7e1c392c62d39c364127307cd408421dd5f8cfb0",
+  "upstream_version": "1.4.9",
+  "version_name": "1.4.9-gd.1",
+  "build_number": 1001,
+  "package": "uk.co.grubdirect.support",
+  "name": "GD Remote Support",
+  "server": {
+    "host": "188.166.172.222",
+    "relay": "188.166.172.222:21117",
+    "key": "OUFK49tB0AwtYWGP7IpM+jl5q2VkS1COxmfXlNIr2uM=",
+    "api": ""
+  },
+  "source_url": "https://github.com/grubdirect/gd-rustdesk-client"
+}

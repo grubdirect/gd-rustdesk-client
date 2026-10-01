@@ -1,0 +1,8 @@
+source/
+artifacts/
+__pycache__/
+*.pyc
+*.apk
+*.jks
+*.keystore
+*.env
