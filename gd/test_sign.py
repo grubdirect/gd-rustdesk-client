@@ -39,7 +39,7 @@ class SigningBoundaryTests(unittest.TestCase):
         folder = self.root / 'incoming' / abi
         folder.mkdir(parents=True, exist_ok=True)
         manifest = folder / 'AndroidManifest.xml'
-        manifest.write_text('<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="'+(package or self.policy['package'])+'" android:versionCode="1001" android:versionName="'+self.policy['version_name']+'"><uses-sdk android:minSdkVersion="22" android:targetSdkVersion="33"/><application android:debuggable="'+str(debug).lower()+'"/></manifest>')
+        manifest.write_text('<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="'+(package or self.policy['package'])+'" android:versionCode="'+str({'armeabi-v7a':1000,'arm64-v8a':2000,'x86_64':4000}[abi]+self.policy['build_number'])+'" android:versionName="'+self.policy['version_name']+'"><uses-sdk android:minSdkVersion="22" android:targetSdkVersion="33"/><application android:debuggable="'+str(debug).lower()+'"/></manifest>')
         raw = folder / 'raw.apk'
         self.run_tool(self.tools / 'aapt', 'package', '-f', '-M', manifest, '-I', self.android, '-F', raw)
         with zipfile.ZipFile(raw, 'a') as archive:

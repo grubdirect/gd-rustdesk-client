@@ -39,6 +39,8 @@ with tempfile.TemporaryDirectory(prefix='gd-support-sign-') as folder:
                     raise ValueError('Unexpected Android package')
                 if not native or native[1] not in ('arm64-v8a','armeabi-v7a','x86_64'):raise ValueError('Unexpected native architecture')
                 abi=native[1]
+                expected_code={'armeabi-v7a':1000,'arm64-v8a':2000,'x86_64':4000}[abi]+policy['build_number']
+                if int(match[2])!=expected_code:raise ValueError('Unexpected Android version code')
                 if abi in artifacts:raise ValueError('Duplicate ABI')
                 subprocess.run([tools/'zipalign','-c','-P','16','4',source],check=True,stdout=subprocess.DEVNULL)
                 target=output/filename.replace('-unsigned.apk','.apk')
